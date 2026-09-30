@@ -1,2 +1,2 @@
 # Hoshino-Module-Source-Code
-专为 Root 玩家打造的安卓模块工具箱。检测 Root、管理模块、逐核监控 CPU/GPU、红外遥控、强制高刷、系统录屏——一个 App 全搞定。
+A toolbox of Android modules for Root gamers. Root detection, management module, core-by-core monitoring of CPU/GPU, infrared remote control, forced high brush, system screen recording-all done by an App.
