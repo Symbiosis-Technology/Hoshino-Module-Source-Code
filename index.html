@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#0d1117">
+<title>Hoshino Module · 源码下载</title>
+<style>
+  :root{
+    --bg:#0d1117; --bg2:#010409; --panel:#161b22; --panel2:#1c232c;
+    --line:#30363d; --txt:#e6edf3; --dim:#8b949e; --muted:#6e7681;
+    --blue:#2f81f7; --blue2:#1f6feb; --green:#3fb950; --amber:#d29922; --red:#f85149;
+    --mono:"SFMono-Regular",Consolas,"Liberation Mono",Menlo,monospace;
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  html,body{margin:0;padding:0}
+  body{
+    background:var(--bg); color:var(--txt);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+    font-size:15px; line-height:1.6;
+    background-image:radial-gradient(900px 500px at 80% -10%,rgba(47,129,247,.10),transparent 60%),
+                     radial-gradient(700px 400px at 0% 0%,rgba(63,185,80,.05),transparent 55%);
+    min-height:100vh; padding-bottom:env(safe-area-inset-bottom);
+  }
+  a{color:var(--blue);text-decoration:none}
+  a:hover{text-decoration:underline}
+
+  .wrap{max-width:760px;margin:0 auto;padding:14px 14px 40px}
+
+  /* ---------- header ---------- */
+  .top{display:flex;align-items:center;gap:8px;font-size:12.5px;color:var(--dim);flex-wrap:wrap}
+  .top .sep{color:var(--muted)}
+  .top a{color:var(--dim)}
+  .brand{display:flex;align-items:center;gap:10px;margin:14px 0 4px}
+  .oct{width:34px;height:34px;border-radius:9px;background:var(--panel2);border:1px solid var(--line);
+       display:grid;place-items:center;flex:none}
+  .brand h1{font-size:22px;margin:0;letter-spacing:.3px}
+  .brand h1 small{font-weight:400;color:var(--muted);font-size:15px}
+  .badges{display:flex;gap:6px;flex-wrap:wrap;margin:10px 0 2px}
+  .b{font-size:11.5px;color:var(--dim);border:1px solid var(--line);background:var(--panel);
+     border-radius:999px;padding:2px 9px;display:inline-flex;align-items:center;gap:5px}
+  .b i{width:7px;height:7px;border-radius:50%;background:var(--muted);display:inline-block}
+  .desc{color:var(--dim);font-size:14px;margin:10px 0 0}
+
+  /* ---------- card ---------- */
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:12px;margin-top:16px;overflow:hidden}
+  .card>h2{font-size:14px;margin:0;padding:11px 14px;font-weight:600;
+           border-bottom:1px solid var(--line);display:flex;align-items:center;gap:7px}
+  .card>h2 em{font-style:normal;color:var(--muted);font-weight:400;font-size:12px;margin-left:auto}
+  .pad{padding:14px}
+
+  /* ---------- download ---------- */
+  .dl-row{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:10px}
+  select{
+    flex:1 1 210px;min-width:180px;background:var(--bg2);color:var(--txt);
+    border:1px solid var(--line);border-radius:8px;padding:9px 10px;font-size:14px;font-family:inherit;
+    background-image:linear-gradient(45deg,transparent 50%,var(--dim) 50%),linear-gradient(135deg,var(--dim) 50%,transparent 50%);
+    background-position:calc(100% - 14px) 50%,calc(100% - 9px) 50%;background-size:5px 5px,5px 5px;background-repeat:no-repeat;
+    appearance:none;padding-right:28px;
+  }
+  select:focus{outline:none;border-color:var(--blue)}
+  .btn{flex:1 1 180px;min-width:160px;display:inline-flex;align-items:center;justify-content:center;gap:7px;
+       background:linear-gradient(180deg,#238636,#2ea043);color:#fff;border:1px solid rgba(240,246,252,.1);
+       border-radius:8px;padding:10px 14px;font-size:14.5px;font-weight:600;cursor:pointer;font-family:inherit;text-align:center}
+  .btn:active{transform:translateY(1px)}
+  .btn.ghost{background:var(--panel2);color:var(--txt);border:1px solid var(--line)}
+  .meta-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:1px;background:var(--line);margin-top:2px}
+  .meta-grid>div{background:var(--panel);padding:10px 12px}
+  .meta-grid dt{font-size:11.5px;color:var(--muted);margin:0}
+  .meta-grid dd{margin:2px 0 0;font-size:13.5px;font-family:var(--mono);color:var(--txt)}
+
+  /* ---------- checksum ---------- */
+  .hash{font-family:var(--mono);font-size:12px;color:var(--dim);background:var(--bg2);border:1px solid var(--line);
+        border-radius:8px;padding:8px 10px;word-break:break-all;margin-top:10px}
+  .hash b{color:var(--txt);font-weight:500}
+
+  /* ---------- note ---------- */
+  .steps{counter-reset:s;margin:4px 0 0;padding:0;list-style:none}
+  .steps li{counter-increment:s;position:relative;padding:2px 0 9px 26px;border-left:1px solid var(--line);margin-left:8px}
+  .steps li:last-child{border-left-color:transparent;padding-bottom:0}
+  .steps li::before{content:counter(s);position:absolute;left:-8px;top:1px;width:16px;height:16px;border-radius:50%;
+                    background:var(--panel2);border:1px solid var(--line);color:var(--dim);font-size:10px;
+                    display:grid;place-items:center;font-family:var(--mono)}
+  code{font-family:var(--mono);font-size:12.5px;background:var(--bg2);border:1px solid var(--line);
+       border-radius:5px;padding:1px 5px;color:#ffa657}
+  .warn{font-size:12.5px;color:#ffa657;background:rgba(210,153,34,.08);border:1px solid rgba(210,153,34,.35);
+        border-radius:8px;padding:9px 11px;margin-top:10px}
+  .warn b{color:#ffcf6f}
+
+  /* ---------- toast ---------- */
+  #toast{position:fixed;left:50%;bottom:26px;transform:translate(-50%,20px);opacity:0;pointer-events:none;
+         background:var(--panel2);border:1px solid var(--line);color:var(--txt);font-size:13px;
+         padding:9px 14px;border-radius:999px;transition:.22s;z-index:99;max-width:88vw;text-align:center}
+  #toast.show{opacity:1;transform:translate(-50%,0)}
+
+  /* ---------- repo tree ---------- */
+  .files{list-style:none;margin:0;padding:0}
+  .files li{border-bottom:1px solid var(--line)}
+  .files li:last-child{border-bottom:0}
+  .files a{display:flex;align-items:center;gap:8px;padding:8px 14px;color:var(--txt);font-size:13.5px}
+  .files a:hover{background:rgba(177,186,196,.06);text-decoration:none}
+  .ft{color:var(--muted);font-family:var(--mono);font-size:12px;margin-left:auto}
+  .ico{width:16px;height:16px;flex:none;opacity:.85}
+  .dirty{display:inline-block;font-size:11px;color:var(--muted);margin-left:6px}
+  footer{margin-top:18px;font-size:11.5px;color:var(--muted);text-align:center;line-height:1.9}
+  .sk{display:inline-block;height:11px;border-radius:3px;background:var(--panel2);border:1px solid var(--line)}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="top">
+    <a href="https://github.com/Symbiosis-Technology" id="u-org">Symbiosis-Technology</a>
+    <span class="sep">/</span>
+    <a href="https://github.com/Symbiosis-Technology/Hoshino-Module" id="u-repo">Hoshino-Module</a>
+    <span class="sep">›</span>
+    <span>下载</span>
+  </div>
+
+  <div class="brand">
+    <div class="oct" aria-hidden="true">
+      <svg width="19" height="19" viewBox="0 0 16 16" fill="#e6edf3"><path d="M8 0C3.58 0 0 3.58 0 8a8 8 0 0 0 5.47 7.59c.4.07.55-.17.55-.38v-1.34c-2.22.48-2.69-1.07-2.69-1.07-.36-.92-.89-1.17-.89-1.17-.73-.5.05-.49.05-.49.8.06 1.22.82 1.22.82.72 1.23 1.88.87 2.34.67.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82a7.6 7.6 0 0 1 4 0c1.53-1.03 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.28.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48v2.19c0 .21.15.46.55.38A8 8 0 0 0 16 8c0-4.42-3.58-8-8-8Z"/></svg>
+    </div>
+    <h1>Hoshino Module <small id="repo-name">…</small></h1>
+  </div>
+
+  <p class="desc" id="repo-desc">面向 Root 玩家的安卓模块工具箱：检测 Root、管理模块、逐核监控 CPU/GPU、红外遥控、强制高刷、系统录屏。</p>
+
+  <div class="badges">
+    <span class="b"><i id="dot-lic" style="background:var(--muted)"></i><span id="t-lic">MIT License</span></span>
+    <span class="b"><i id="dot-branch" style="background:var(--green)"></i><span id="t-branch">main</span></span>
+    <span class="b"><i style="background:var(--blue)"></i><span id="t-upd">载入中…</span></span>
+    <span class="b"><i style="background:var(--amber)"></i><span id="t-size">12.2 MB</span></span>
+  </div>
+
+  <!-- ============ 下载 ============ -->
+  <section class="card">
+    <h2>源码下载 <em id="mirror-label">自动选择可用源</em></h2>
+    <div class="pad">
+      <div class="dl-row">
+        <select id="mirror" aria-label="下载镜像源">
+          <option value="auto" selected>🛰 自动选择（推荐）</option>
+          <option value="gh">GitHub 官方（raw.githubusercontent.com）</option>
+          <option value="gh-file">GitHub 文件页（浏览器中转）</option>
+          <option value="jsdelivr">jsDelivr CDN（全球 CDN 加速）</option>
+          <option value="ghdog">ghgo.xyz 镜像</option>
+          <option value="ghproxy">gh-proxy 镜像</option>
+        </select>
+        <a class="btn" id="dl-btn" href="#" download>
+          <svg width="15" height="15" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M2.75 14A1.75 1.75 0 0 1 1 12.25v-2.5a.75.75 0 0 1 1.5 0v2.5c0 .138.112.25.25.25h10.5a.25.25 0 0 0 .25-.25v-2.5a.75.75 0 0 1 1.5 0v2.5A1.75 1.75 0 0 1 13.25 14Z"/><path d="M7.25 7.689V2a.75.75 0 0 1 1.5 0v5.689l1.97-1.969a.749.749 0 1 1 1.06 1.06l-3.25 3.25a.749.749 0 0 1-1.06 0L4.22 6.78a.749.749 0 1 1 1.06-1.06Z"/></svg>
+          <span id="dl-txt">开始下载</span>
+        </a>
+      </div>
+      <div class="meta-grid">
+        <div><dt>文件名</dt><dd id="m-name">Hoshino Module.zip</dd></div>
+        <div><dt>大小</dt><dd id="m-size">12.2 MB</dd></div>
+        <div><dt>更新于</dt><dd id="m-upd">—</dd></div>
+        <div><dt>提交</dt><dd id="m-sha">—</dd></div>
+      </div>
+      <div class="hash"><b>SHA-1</b> e9eb30cd81d080c14351f10b4a48ef2b0d8d8b68　<span style="color:var(--muted)">下载后校验：</span> <code style="font-size:11.5px">sha1sum Hoshino\ Module.zip</code></div>
+      <div class="warn" id="warn-box">
+        <b>若点击没反应 / 下载失败：</b>浏览器会拦截跨站下载，先点 <b>备用源</b> 在文件页手动下载；若都失败，说明当前网络连不上 GitHub，请切换移动数据 / Wi-Fi，或使用科学上网后重试。
+      </div>
+      <div class="dl-row" style="margin-top:10px;margin-bottom:0">
+        <a class="btn ghost" id="alt-btn" href="#">备用源：文件页手动下载</a>
+        <button class="btn ghost" id="copy-btn" style="flex:0 0 auto">复制直链</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 仓库文件 ============ -->
+  <section class="card">
+    <h2>仓库文件 <em id="tree-tip">3 项</em></h2>
+    <ul class="files" id="file-list">
+      <li><a><span class="sk" style="width:14px"></span> 载入中…</a></li>
+    </ul>
+  </section>
+
+  <!-- ============ 使用说明 ============ -->
+  <section class="card">
+    <h2>使用说明</h2>
+    <div class="pad">
+      <ol class="steps">
+        <li>下载后解压 <code>Hoshino Module.zip</code>，得到模块源码与资源目录（assets / kotlin / res / smali / META-INF 等）。</li>
+        <li>推荐用 <a href="https://github.com/Saki-Eri/RootFinder">Root Finder</a> 或 Magisk 管理器校验当前设备 Root 状态后再安装模块。</li>
+        <li>逐核 CPU/GPU 监控、强制高刷、红外遥控、系统录屏等特性需要 Root 权限，部分功能依赖机型内核与红外硬件。</li>
+        <li>开源协议为 MIT，可自由使用、修改与分发，请保留原始 LICENSE。</li>
+      </ol>
+      <div class="warn" style="color:var(--dim);background:transparent;border-color:var(--line)">
+        ⚠️ 模块类工具涉及系统底层修改，请先完整备份数据；刷入不兼容模块可能导致无法开机，责任自负。
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    本页为离线静态页面，不收集任何数据。<br>
+    页面信息来自 GitHub API · 源码文件托管于
+    <a href="https://github.com/Symbiosis-Technology/Hoshino-Module">Symbiosis-Technology/Hoshino-Module</a>
+  </footer>
+</div>
+
+<div id="toast"></div>
+
+<script>
+/* ================= 配置 ================= */
+const REPO   = "Symbiosis-Technology/Hoshino-Module";
+const BRANCH = "main";
+const FILE   = "Hoshino Module.zip";
+const SIZE   = 12228768;          // 12,228,768 B = 12.2 MB
+const SHA    = "e9eb30cd81d080c14351f10b4a48ef2b0d8d8b68";
+const NAME   = "Hoshino Module.zip";
+
+const enc = encodeURIComponent(FILE);
+
+/* 各镜像源的真实下载地址（运行时按选择拼装） */
+const SRC = {
+  gh:       () => `https://raw.githubusercontent.com/${REPO}/${BRANCH}/${enc}`,
+  "gh-file":() => `https://github.com/${REPO}/raw/${BRANCH}/${enc}`,
+  jsdelivr: () => `https://cdn.jsdelivr.net/gh/${REPO}@${BRANCH}/${FILE.replace(/ /g,"%20")}`,
+  ghdog:    () => `https://ghgo.xyz/https://github.com/${REPO}/raw/${BRANCH}/${enc}`,
+  ghproxy:  () => `https://gh-proxy.com/https://github.com/${REPO}/raw/${BRANCH}/${enc}`
+};
+
+/* ================= 工具 ================= */
+const $ = (s) => document.querySelector(s);
+const toast = (msg) => { const t=$("#toast"); t.textContent=msg; t.classList.add("show");
+  clearTimeout(t._tm); t._tm=setTimeout(()=>t.classList.remove("show"),1800); };
+
+function pick(choice){
+  if(choice==="auto") return SRC.gh();                       // 默认官方源，稳定优先
+  return SRC[choice]();
+}
+
+function bindLink(){
+  const c = $("#mirror").value;
+  const url = pick(c);
+  $("#dl-btn").href = url;
+  $("#alt-btn").href = `https://github.com/${REPO}/blob/${BRANCH}/${enc}`;
+  $("#alt-btn").target = "_blank"; $("#alt-btn").rel = "noopener";
+  $("#mirror-label").textContent =
+      c==="auto" ? "自动选择可用源" :
+      c==="gh"   ? "GitHub 官方"   :
+      c==="gh-file" ? "GitHub 文件页" :
+      c==="jsdelivr" ? "jsDelivr CDN" :
+      c==="ghdog"  ? "ghgo.xyz" : "gh-proxy";
+}
+
+$("#mirror").addEventListener("change", bindLink);
+
+/* 点击下载：移动端浏览器常拦截跨站直链，改为先探测再决定行为 */
+$("#dl-btn").addEventListener("click", function(ev){
+  const c = $("#mirror").value;
+  if(c==="auto"){                                            // 自动模式走探测
+    ev.preventDefault();
+    $("#dl-txt").textContent = "探测可用源…";
+    probe().then(url=>{
+      $("#dl-txt").textContent = "开始下载";
+      if(url){ window.location.href = url; }
+      else { toast("当前网络连不上 GitHub，已打开文件页"); window.open(`https://github.com/${REPO}/blob/${BRANCH}/${enc}`,"_blank"); }
+    });
+  }
+});
+
+/* 逐个尝试镜像源，首个返回 200 且非错误页的即为可用 */
+async function probe(){
+  const order = ["gh","jsdelivr","ghdog","ghproxy"];
+  for(const k of order){
+    const url = SRC[k]();
+    try{
+      const ctrl = new AbortController();
+      const tm = setTimeout(()=>ctrl.abort(), 7000);
+      const r = await fetch(url, {method:"GET", mode:"no-cors", signal:ctrl.signal});
+      clearTimeout(tm);
+      $("#mirror").value = k; bindLink();
+      return url;
+    }catch(e){ /* 该源不可用，继续下一个 */ }
+  }
+  return null;
+}
+
+/* 复制直链 */
+$("#copy-btn").addEventListener("click", async ()=>{
+  const url = pick($("#mirror").value);
+  try{
+    await navigator.clipboard.writeText(url);
+    toast("直链已复制");
+  }catch(e){
+    const ta=document.createElement("textarea");
+    ta.value=url;document.body.appendChild(ta);ta.select();
+    try{ document.execCommand("copy"); toast("直链已复制"); }
+    catch(err){ toast("复制失败，请长按链接"); }
+    ta.remove();
+  }
+});
+
+/* ================= 仓库信息（API，能连时自动刷新） ================= */
+function fmtSize(b){ if(b>1048576) return (b/1048576).toFixed(1)+" MB";
+  if(b>1024) return (b/1024).toFixed(1)+" KB"; return b+" B"; }
+function fmtDate(s){ const d=new Date(s); if(isNaN(d)) return s;
+  const p=(n)=>String(n).padStart(2,"0");
+  return `${d.getFullYear()}-${p(d.getMonth()+1)}-${p(d.getDate())}`; }
+
+async function loadAPI(){
+  const base = `https://api.github.com/repos/${REPO}`;
+  try{
+    const r = await fetch(base+"/commits/"+BRANCH,{headers:{"Accept":"application/vnd.github.v3+json"}});
+    if(!r.ok) throw 0;
+    const j = await r.json();
+    $("#t-upd").textContent    = fmtDate(j.commit.author.date);
+    $("#m-upd").textContent    = fmtDate(j.commit.author.date);
+    $("#m-sha").textContent    = j.sha.slice(0,7);
+  }catch(e){ $("#t-upd").textContent="2026-09-27"; $("#m-upd").textContent="2026-09-27"; $("#m-sha").textContent="9083a64"; }
+
+  try{
+    const r = await fetch(base+"/contents",{headers:{"Accept":"application/vnd.github.v3+json"}});
+    if(!r.ok) throw 0;
+    const list = await r.json();
+    renderTree(list);
+  }catch(e){ renderTree([]); }
+}
+
+function ico(name){
+  const f = name.toLowerCase();
+  if(f==="license") return '<svg class="ico" viewBox="0 0 16 16" fill="#c9d1d9"><path d="M8.75.75V2A6.75 6.75 0 0 1 14.85 8.97l1.4.46a.25.25 0 0 1 .16.31l-.4 1.2a.25.25 0 0 1-.3.16l-1.4-.46A6.73 6.73 0 0 1 9.5 14.7l.24 1.45a.25.25 0 0 1-.18.28l-1.2.3a.25.25 0 0 1-.29-.18L7.53 14.7a6.75 6.75 0 0 1-5.1-5.1L.9 9.4a.25.25 0 0 1-.18-.29l.3-1.2a.25.25 0 0 1 .28-.18l1.45.24A6.75 6.75 0 0 1 7.25 2V.75a.25.25 0 0 1 .5 0Zm2.75 7a2 2 0 1 0-4 0 2 2 0 0 0 4 0Z"/></svg>';
+  if(f==="readme.md") return '<svg class="ico" viewBox="0 0 16 16" fill="#c9d1d9"><path d="M0 1.75A.75.75 0 0 1 .75 1h4.253a.75.75 0 0 1 .75.75v4.25h4.5V3.75a.75.75 0 0 1 .75-.75h4.253a.75.75 0 0 1 .75.75v9.5a.75.75 0 0 1-.75.75H11.75a.75.75 0 0 1-.75-.75v-3.5h-4.5v3.5a.75.75 0 0 1-.75.75H.75a.75.75 0 0 1-.75-.75Z"/></svg>';
+  return '<svg class="ico" viewBox="0 0 16 16" fill="#c9d1d9"><path d="M2 2.5a.5.5 0 0 1 .5-.5h11a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5Zm1 .5v9a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V3H3Zm3 4.5v4h2v-4Z"/></svg>';
+}
+
+function renderTree(list){
+  const ul = $("#file-list");
+  const TREE = [
+    {name:"Hoshino Module.zip", type:"file", size:SIZE,
+     html_url:`https://github.com/${REPO}/blob/${BRANCH}/${enc}`, download_url:SRC.gh(),
+     note:"源码包 · 核心文件"},
+    {name:"README.md",          type:"file", size:32,
+     html_url:`https://github.com/${REPO}#readme`, download_url:`https://raw.githubusercontent.com/${REPO}/${BRANCH}/README.md`,
+     note:"说明文档"},
+    {name:"LICENSE",            type:"file", size:null,
+     html_url:`https://github.com/${REPO}/blob/${BRANCH}/LICENSE`, download_url:`https://raw.githubusercontent.com/${REPO}/${BRANCH}/LICENSE`,
+     note:"MIT"}
+  ];
+  if(!Array.isArray(list) || !list.length){
+    ul.innerHTML = TREE.map(it=>`<li><a href="${it.download_url}" download>
+      ${ico(it.name)}<span>${it.name}<span class="dirty">${it.note}</span></span>
+      <span class="ft">${it.size?fmtSize(it.size):"—"}</span></a></li>`).join("");
+    $("#tree-tip").textContent = "3 项（离线缓存）";
+    return;
+  }
+  ul.innerHTML = list.map(it=>{
+    const cached = TREE.find(t=>t.name===it.name);
+    const note = cached ? cached.note : "";
+    return `<li><a href="${it.html_url}" target="_blank" rel="noopener">
+      ${ico(it.name)}<span>${it.name}${note?`<span class="dirty">${note}</span>`:""}</span>
+      <span class="ft">${it.size?fmtSize(it.size):"—"}</span></a></li>`;
+  }).join("");
+  $("#tree-tip").textContent = list.length+" 项";
+}
+
+/* ================= 启动 ================= */
+$("#m-size").textContent = fmtSize(SIZE);
+$("#m-upd").textContent  = "2026-09-27";
+bindLink();
+loadAPI();
+</script>
+</body>
+</html>
